@@ -105,8 +105,3 @@ def mix_audio():
     except Exception as e:
         print(f"❌ Server Error: {e}")
         return str(e), 500
-
-if __name__ == '__main__':
-    # 關鍵：讓它監聽所有網路介面，端口使用 Render 的環境變數
-    port = int(os.environ.get('PORT', 5000)) 
-    app.run(host='0.0.0.0', port=port)
