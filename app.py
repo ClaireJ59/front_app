@@ -3,6 +3,25 @@ from flask import Flask, request, send_file
 import json
 import os
 from pydub import AudioSegment
+# --------------------------------------------------------
+# [關鍵修正] 解決 Render/Python 3.13 中 'pyaudioop' 遺失的問題
+# 讓 pydub 回退到使用標準的 'audioop' 庫
+# --------------------------------------------------------
+import sys
+# 檢查是否因缺少 C 擴展而失敗，如果是，則假裝我們已導入該模組
+if 'pyaudioop' in sys.modules:
+    # 這通常不會發生，如果發生則繼續
+    pass
+else:
+    # 這是實際的修正：將標準庫 audioop 偽裝成 pydub 尋找的 pyaudioop
+    try:
+        import audioop
+        sys.modules['pyaudioop'] = audioop
+        print("✅ Successfully patched audioop module.")
+    except ImportError:
+        print("❌ Cannot load standard audioop module.")
+        # 如果 audioop 也無法加載，這會是一個更底層的錯誤
+# --------------------------------------------------------
 
 
 app = Flask(__name__)
@@ -105,3 +124,4 @@ def mix_audio():
     except Exception as e:
         print(f"❌ Server Error: {e}")
         return str(e), 500
+
